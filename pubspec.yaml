@@ -1,4 +1,4 @@
-name: flutter_test_2323
+name: out_project
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -70,6 +70,7 @@ flutter:
     - assets/icons/CALENDAR_selected.png
     - assets/icons/PROFILE.png
     - assets/icons/PROFILE_selected.png
+
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
