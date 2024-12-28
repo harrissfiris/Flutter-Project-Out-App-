@@ -20,66 +20,95 @@ class _SignUpPageState extends State<SignUpPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Μέθοδος για εγγραφή χρήστη
-  Future<void> _signUp() async {
-    final username = _usernameController.text.trim();
-    final email = _emailController.text.trim();
-    final phone = _phoneController.text.trim();
-    final password = _passwordController.text.trim();
+  // Έλεγχος αν το username είναι μοναδικό
+  Future<bool> _isUsernameUnique(String username) async {
+  final querySnapshot = await _firestore
+      .collection('users')
+      .where('username', isEqualTo: username.toLowerCase()) // Συγκρίνει πάντα πεζά
+      .get();
 
-    if (username.isEmpty || email.isEmpty || phone.isEmpty || password.isEmpty) {
-      _showErrorDialog('Please fill in all fields.');
+  return querySnapshot.docs.isEmpty; // Επιστρέφει true αν δεν υπάρχει
+}
+
+// Έλεγχος αν το email υπάρχει ήδη στη Firestore
+Future<bool> _isEmailUnique(String email) async {
+  final querySnapshot = await _firestore
+      .collection('users')
+      .where('email', isEqualTo: email)
+      .get();
+
+  return querySnapshot.docs.isEmpty;
+}
+
+// Μέθοδος για εγγραφή χρήστη
+Future<void> _signUp() async {
+  final username = _usernameController.text.trim();
+  final email = _emailController.text.trim();
+  final phone = _phoneController.text.trim();
+  final password = _passwordController.text.trim();
+
+  if (username.isEmpty || email.isEmpty || phone.isEmpty || password.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields.')),
+      );
+    return;
+  }
+
+  try {
+    // Έλεγχος για μοναδικότητα του email
+    bool isEmailUnique = await _isEmailUnique(email);
+    if (!isEmailUnique) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('An account with this email already exists.')),
+      );
       return;
     }
 
-    try {
-      // Δημιουργία χρήστη με email και password
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
+    // Έλεγχος για μοναδικότητα του username
+    bool isUnique = await _isUsernameUnique(username);
+    if (!isUnique) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Username is already taken. Please choose another one.')),
       );
-
-      // Παίρνουμε το UID του χρήστη
-      String uid = userCredential.user!.uid;
-
-      // Αποθήκευση των δεδομένων του χρήστη στη Firestore
-      await _firestore.collection('users').doc(uid).set({
-        'username': username,
-        'email': email,
-        'phone': phone,
-        'selectedCategories': [], // Αρχικά κενές κατηγορίες
-        'createdAt': Timestamp.now(),
-      });
-
-      // Μεταφορά στη σελίδα προτιμήσεων (preferences)
-      Navigator.pushNamed(context, '/preferences');
-    } catch (e) {
-      _showErrorDialog(e.toString());
+      return;
     }
-  }
 
-  // Μέθοδος εμφάνισης σφάλματος
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Error'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      ),
+    // Δημιουργία χρήστη με email και password
+    UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
     );
+
+    // Παίρνουμε το UID του χρήστη
+    String uid = userCredential.user!.uid;
+
+    // Αποθήκευση των δεδομένων του χρήστη στη Firestore
+    await _firestore.collection('users').doc(uid).set({
+      'username': username.toLowerCase(), // Αποθηκεύουμε πάντα σε πεζά γράμματα
+      'email': email,
+      'phone': phone,
+      'selectedCategories': [],
+      'createdAt': Timestamp.now(),
+    });
+
+    // Μεταφορά στη σελίδα προτιμήσεων (preferences)
+    if (!mounted) return;
+    Navigator.pushNamed(
+      context,
+      '/preferences',
+      arguments: {'origin': 'signup'},
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred: ${e.toString()}')),
+      );
   }
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false, // Αποτρέπει το "ανέβασμα" των στοιχείων
       body: Stack(
         children: [
           // Background Image
@@ -99,7 +128,7 @@ class _SignUpPageState extends State<SignUpPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 50), // Spacing from the top
+                  const SizedBox(height: 90), // Spacing from the top
 
                   // Title and Subtitle
                   const Text(

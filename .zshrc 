@@ -1,0 +1,10 @@
+export PATH=${PATH}:/usr/local/mysql/mysql-8.3.0-macos14-arm64/bin
+
+
+export PATH="$PATH:"/Applications/microchip/xc8/v2.46/bin""
+
+# Created by `pipx` on 2024-05-20 10:09:39
+export PATH="$PATH:/Users/harrissfiris/.local/bin"
+export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+export PATH="/Applications/Android Studio.app/Contents/jbr/Contents/Home/bin:$PATH"
+export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"

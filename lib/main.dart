@@ -20,18 +20,19 @@ import 'screens/plan_pages/activity_page.dart';
 import 'screens/plan_pages/friends_search_page.dart';
 import 'screens/plan_pages/plan_confirmation_page.dart';
 import 'screens/plan_pages/plan_creation_page.dart';
+import 'screens/plan_pages/arranged_plan_page.dart';
+import 'screens/plan_pages/add_participants.dart';
 // Profile Pages
 import 'screens/profile_pages/avatar_selection.dart';
 import 'screens/profile_pages/friends_profile_page.dart';
 import 'screens/profile_pages/my_friends_page.dart';
+import 'screens/profile_pages/add_friends_page.dart';
 import 'screens/profile_pages/profile_settings.dart';
-import 'screens/profile_pages/qr_code_page.dart';
 import 'screens/profile_pages/qr_scanner_page.dart';
 // Team Pages
-import 'screens/team_pages/arranged_plan_page.dart';
 import 'screens/team_pages/group_creation_page.dart';
 import 'screens/team_pages/team_page.dart';
-import 'screens/team_pages/time_suggestion_page.dart';
+import 'screens/team_pages/add_members.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -73,21 +74,40 @@ class MyApp extends StatelessWidget {
         '/activity_page': (context) => const ActivityPage(),
         '/friends_search_page': (context) => const FriendsSearchPage(),
         '/plan_confirmation_page': (context) => const PlanConfirmationPage(),
-        '/plan_creation_page': (context) => const PlanCreationPage(),
+        '/arranged_plan_page': (context) => const ArrangedPlanPage(),
+        '/plan_creation_page': (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as String?;
+            if (args == null) {
+              throw Exception("Missing activityId for PlanCreationPage");
+            }
+            return PlanCreationPage(activityId: args);
+        },
+        '/add_participants': (context) {
+  final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+  if (args == null || args['planId'] == null) {
+    throw Exception("Missing planId for AddParticipantsPage");
+  }
+  return AddParticipants(planId: args['planId']);
+},
 
         // Profile Pages
         '/avatar_selection': (context) => const AvatarSelectionPage(),
-        '/friends_profile_page': (context) => const FriendsProfilePage(),
+        '/friends_profile_page': (context) => const FriendsProfilePage(friendId: '',),
         '/my_friends_page': (context) => const MyFriendsPage(),
+        '/add_friends_page': (context) => const AddFriendsPage(),
         '/profile_settings': (context) => const ProfileSettingsPage(),
-        '/qr_code_page': (context) => const QRCodePage(),
         '/qr_scanner_page': (context) => const QRScannerPage(),
 
         // Team Pages
-        '/arranged_plan_page': (context) => const ArrangedPlanPage(),
         '/group_creation_page': (context) => const GroupCreationPage(),
         '/team_page': (context) => const TeamPage(),
-        '/time_suggestion_page': (context) => const TimeSuggestionPage(),
+        '/add_members': (context) {
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (args == null || !args.containsKey('groupId')) {
+      throw Exception("Missing groupId for AddMembers page");
+    }
+    return AddMembers(groupId: args['groupId']);
+  },
       },
     );
   }

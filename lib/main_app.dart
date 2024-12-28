@@ -7,14 +7,22 @@ import 'screens/main_pages/calendar_main_page.dart';
 import 'screens/main_pages/profile_main_page.dart';
 
 class MainApp extends StatefulWidget {
-  const MainApp({super.key});
+  final int initialPage;
+
+  const MainApp({super.key, this.initialPage = 0}); // Προαιρετικό όρισμα
 
   @override
   State<MainApp> createState() => _MainAppState();
 }
 
 class _MainAppState extends State<MainApp> {
-  int _currentIndex = 0; // Ο δείκτης για την τρέχουσα σελίδα
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialPage; // Ορισμός αρχικής σελίδας
+  }
 
   final List<Widget> _screens = [
     HomePage(),

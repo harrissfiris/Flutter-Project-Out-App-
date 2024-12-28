@@ -1,4 +1,4 @@
 {
     "java.compile.nullAnalysis.mode": "automatic",
-    "cmake.sourceDirectory": "/Users/harrissfiris/Development/projects/Flutter-Project-Out-App--main/linux"
+    "cmake.sourceDirectory": "/Users/harrissfiris/Development/projects/out_project/linux"
 }

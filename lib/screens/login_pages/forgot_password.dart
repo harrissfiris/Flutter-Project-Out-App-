@@ -1,13 +1,99 @@
 import 'package:flutter/material.dart';
-import '../../widgets/back_button_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../widgets/rounded_button.dart';
 
-class ForgotPasswordPage extends StatelessWidget {
+class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
+
+  @override
+  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
+}
+
+class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+  final TextEditingController _emailController = TextEditingController();
+
+  // Μέθοδος για έλεγχο αν το email υπάρχει στη Firestore
+  Future<bool> _isEmailInDatabase(String email) async {
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .get();
+
+      return querySnapshot.docs.isNotEmpty;
+    } catch (e) {
+      debugPrint("Error checking email: $e");
+      return false;
+    }
+  }
+
+  // Μέθοδος για αποστολή email επαναφοράς κωδικού
+  Future<void> _sendPasswordResetEmail() async {
+    final email = _emailController.text.trim();
+
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter your email'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    // Έλεγχος αν το email υπάρχει στη βάση
+    bool emailExists = await _isEmailInDatabase(email);
+    if (!emailExists) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No account found with this email.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    try {
+      // Αποστολή email επαναφοράς κωδικού
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+
+      // Εμφάνιση επιτυχίας και πλοήγηση στο login
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Password reset email sent! Check your inbox.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      Navigator.pop(context); // Επιστροφή στο Login Page
+    } catch (e) {
+      // Διαχείριση σφάλματος
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
+      extendBodyBehindAppBar: true, // Το AppBar πίσω από το περιεχόμενο
+appBar: AppBar(
+  backgroundColor: Colors.transparent, // Διαφάνεια
+  elevation: 0, // Αφαιρεί τη σκιά
+  iconTheme: const IconThemeData(color: Colors.black), // Χρώμα του back button
+  leading: IconButton(
+    icon: const Icon(Icons.arrow_back_ios), // Χρησιμοποιεί το "<" για όλα τα platforms
+    onPressed: () {
+      Navigator.pop(context);
+    },
+  ),
+),
       body: Stack(
         children: [
           // Background
@@ -19,10 +105,6 @@ class ForgotPasswordPage extends StatelessWidget {
               ),
             ),
           ),
-
-          // Back Button
-          const BackButtonWidget(),
-
           // Content
           Positioned.fill(
             child: Padding(
@@ -30,7 +112,6 @@ class ForgotPasswordPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Title
                   const Text(
                     "Request Password:",
                     style: TextStyle(
@@ -43,6 +124,8 @@ class ForgotPasswordPage extends StatelessWidget {
 
                   // Email Field
                   TextField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       hintText: "example@gmail.com",
                       filled: true,
@@ -57,9 +140,7 @@ class ForgotPasswordPage extends StatelessWidget {
                   // Rounded Button
                   RoundedButton(
                     text: "Send email",
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/open_app');
-                    },
+                    onPressed: _sendPasswordResetEmail,
                   ),
                   const SizedBox(height: 20),
 
@@ -73,7 +154,6 @@ class ForgotPasswordPage extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () {
-                          // Navigate to Sign Up Page
                           Navigator.pushNamed(context, '/signup');
                         },
                         child: const Text(

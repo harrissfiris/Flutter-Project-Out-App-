@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../widgets/rounded_button.dart';
 import '../../widgets/custom_text_field.dart';
-import '../../widgets/plus_button.dart';
-import '../../widgets/back_button_widget.dart';
 
 class ProfileSettingsPage extends StatefulWidget {
   const ProfileSettingsPage({super.key});
@@ -32,6 +30,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       if (user != null) {
         DocumentSnapshot userDoc =
             await _firestore.collection('users').doc(user.uid).get();
+
         setState(() {
           currentUsername = userDoc['username'] ?? '';
           _usernameController.text = currentUsername;
@@ -44,50 +43,113 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     }
   }
 
-  Future<void> _saveChanges() async {
-  try {
-    User? user = _auth.currentUser;
-    if (user != null) {
-      String updatedUsername = _usernameController.text.trim();
-      await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .update({'username': updatedUsername});
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Changes saved successfully!')),
-      );
+  Future<bool> _isUsernameUnique(String username) async {
+    final querySnapshot = await _firestore
+        .collection('users')
+        .where('username', isEqualTo: username)
+        .get();
 
-      // Επιστροφή του νέου username στο προηγούμενο screen
-      Navigator.pop(context, updatedUsername);
-    }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error saving changes: $e')),
-    );
+    return querySnapshot.docs.isEmpty;
   }
-}
+
+  Future<void> _saveChanges() async {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        String updatedUsername = _usernameController.text.trim();
+
+        if (updatedUsername.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Username cannot be empty!')),
+          );
+          return;
+        }
+
+        if (updatedUsername != currentUsername) {
+          bool isUnique = await _isUsernameUnique(updatedUsername);
+          if (!isUnique) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Username is already taken. Please choose another one.'),
+              ),
+            );
+            return;
+          }
+        }
+
+        await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .update({'username': updatedUsername});
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Changes saved successfully!')),
+        );
+
+        Navigator.pop(context, updatedUsername);
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error saving changes: $e')),
+      );
+    }
+  }
+
+  Future<void> _logout() async {
+    try {
+      await _auth.signOut();
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error during logout: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true, // Το AppBar πίσω από το περιεχόμενο
+appBar: AppBar(
+  backgroundColor: Colors.transparent, // Διαφάνεια
+  elevation: 0, // Αφαιρεί τη σκιά
+  leading: IconButton(
+    icon: const Icon(Icons.arrow_back_ios), // Χρησιμοποιεί το "<" για όλες τις πλατφόρμες
+    onPressed: () {
+      Navigator.pop(context); // Επιστροφή στην προηγούμενη οθόνη
+    },
+  ),
+  actions: [
+    IconButton(
+      icon: const Icon(Icons.exit_to_app, color: Colors.black),
+      onPressed: _logout, // Ενέργεια για αποσύνδεση
+    ),
+  ],
+),
       body: Stack(
         children: [
-          // Content
+          // Wallpaper
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/background_small.jpg'), // Το wallpaper
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Back Button
-                  const BackButtonWidget(),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 80),
 
                   // Title
                   const Center(
                     child: Text(
-                      "Edit Profile",
+                      "Edit Username",
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -95,31 +157,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                     ),
                   ),
 
-                  const SizedBox(height: 20),
-
-                  // Avatar with Plus Button
-                  Center(
-                    child: Stack(
-                      children: [
-                        const CircleAvatar(
-                          radius: 50,
-                          backgroundImage:
-                              AssetImage('assets/icons/PROFILE.png'),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: PlusButton(
-                            onTap: () {
-                              Navigator.pushNamed(context, '/avatar_selection');
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 60),
 
                   // Username Field
                   CustomTextField(
@@ -128,31 +166,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                   ),
 
                   const SizedBox(height: 20),
-
-                  // Change Interests
-                  Row(
-                    children: [
-                      const Text(
-                        "Do you want to change your ",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/preferences');
-                        },
-                        child: const Text(
-                          "interests",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.purple,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
-                      const Text("?", style: TextStyle(fontSize: 16)),
-                    ],
-                  ),
 
                   const Spacer(),
 

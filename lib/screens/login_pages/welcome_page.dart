@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../main_app.dart';
 import '../../widgets/rounded_button.dart';
-import '../../widgets/back_button_widget.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -20,9 +19,6 @@ class WelcomePage extends StatelessWidget {
               ),
             ),
           ),
-
-          // Back Button Widget
-          const BackButtonWidget(),
 
           // Welcome Text
           const Positioned(
@@ -46,12 +42,12 @@ class WelcomePage extends StatelessWidget {
             left: 20, // Απόσταση από αριστερά
             right: 20, // Απόσταση από δεξιά
             child: RoundedButton(
-              text: "Welcome",
+              text: "Get started to go Out!",
               onPressed: () {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MainApp()),
-                  );
+                Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const MainApp()),
+  );
               },
             ),
           ),
