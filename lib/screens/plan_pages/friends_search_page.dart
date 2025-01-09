@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../../widgets/rounded_button.dart';
+import 'package:vibration/vibration.dart';
 
 class FriendsSearchPage extends StatefulWidget {
   const FriendsSearchPage({super.key});
@@ -197,6 +198,11 @@ if (selectedParticipant != null) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Plan created successfully!')),
     );
+
+     // Προκαλεί δόνηση
+    if (await Vibration.hasVibrator() ?? false) {
+      Vibration.vibrate(duration: 500);
+    }
 
     // Navigate to Plan Confirmation Page
     Navigator.pushReplacementNamed(

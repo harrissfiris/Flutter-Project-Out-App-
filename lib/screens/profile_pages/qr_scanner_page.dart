@@ -56,6 +56,7 @@ class _QRScannerPageState extends State<QRScannerPage> {
    return Scaffold(
      extendBodyBehindAppBar: true, // Το AppBar πίσω από το περιεχόμενο
 appBar: AppBar(
+  title: const Text("Scan QR Code"),
   backgroundColor: Colors.transparent, // Διαφάνεια
   elevation: 0, // Αφαιρεί τη σκιά
   iconTheme: const IconThemeData(color: Colors.black), // Χρώμα του back button

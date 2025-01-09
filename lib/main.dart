@@ -26,7 +26,6 @@ import 'screens/plan_pages/add_participants.dart';
 import 'screens/profile_pages/avatar_selection.dart';
 import 'screens/profile_pages/friends_profile_page.dart';
 import 'screens/profile_pages/my_friends_page.dart';
-import 'screens/profile_pages/add_friends_page.dart';
 import 'screens/profile_pages/profile_settings.dart';
 import 'screens/profile_pages/qr_scanner_page.dart';
 // Team Pages
@@ -94,7 +93,6 @@ class MyApp extends StatelessWidget {
         '/avatar_selection': (context) => const AvatarSelectionPage(),
         '/friends_profile_page': (context) => const FriendsProfilePage(friendId: '',),
         '/my_friends_page': (context) => const MyFriendsPage(),
-        '/add_friends_page': (context) => const AddFriendsPage(),
         '/profile_settings': (context) => const ProfileSettingsPage(),
         '/qr_scanner_page': (context) => const QRScannerPage(),
 

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../../widgets/rounded_button.dart';
 import 'friends_profile_page.dart';
+import 'qr_scanner_page.dart';
 
 class MyFriendsPage extends StatelessWidget {
   const MyFriendsPage({super.key});
@@ -174,7 +175,12 @@ appBar: AppBar(
                   RoundedButton(
                     text: "Add new friends",
                     onPressed: () {
-                      Navigator.pushNamed(context, '/add_friends_page');
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const QRScannerPage(),
+                          ),
+                        );
                     },
                   ),
                 ],
