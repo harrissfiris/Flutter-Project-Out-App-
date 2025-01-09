@@ -111,7 +111,10 @@ Widget build(BuildContext context) {
                     },
                     child: const Text(
                       "Forgot Password?",
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(
+                          color: Colors.purple,
+                          fontWeight: FontWeight.bold,
+                        ),
                     ),
                   ),
                 ),

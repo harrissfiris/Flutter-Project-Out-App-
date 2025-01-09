@@ -105,117 +105,123 @@ Future<void> _signUp() async {
   }
 }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false, // Αποτρέπει το "ανέβασμα" των στοιχείων
-      body: Stack(
-        children: [
-          // Background Image
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/background_small.jpg'), // Background Image
-                fit: BoxFit.cover,
-              ),
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    resizeToAvoidBottomInset: false, // Αποτρέπει την αναδιάταξη του περιεχομένου
+    body: Stack(
+      children: [
+        // Wallpaper - Background Image
+        Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/background_small.jpg'),
+              fit: BoxFit.cover, // Καλύπτει ολόκληρη την οθόνη
             ),
           ),
+        ),
 
-          // Content
-          SafeArea(
+        // Scrollable Content
+        SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom, // Προσαρμόζεται στο πληκτρολόγιο
+            ),
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 90), // Spacing from the top
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 90), // Spacing από την κορυφή
 
-                  // Title and Subtitle
-                  const Text(
-                    "Create an account",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    "Connect with your friends today!",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Username Field
-                  CustomTextField(
-                    hintText: "Enter Your Username",
-                    controller: _usernameController,
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Email Field
-                  CustomTextField(
-                    hintText: "Enter Your Email",
-                    controller: _emailController,
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Phone Number Field
-                  CustomTextField(
-                    hintText: "Enter Your Phone Number",
-                    controller: _phoneController,
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Password Field
-                  CustomTextField(
-                    hintText: "Enter Your Password",
-                    isPassword: true,
-                    controller: _passwordController,
-                  ),
-                  const SizedBox(height: 40),
-
-                  // Sign Up Button
-                  RoundedButton(
-                    text: "Sign up",
-                    onPressed: _signUp, // Κλήση της μεθόδου εγγραφής
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Already have an account? Login
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        "Already have an account?",
-                        style: TextStyle(color: Colors.black),
+                    // Τίτλος και Υπότιτλος
+                    const Text(
+                      "Create an account",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
-                      TextButton(
-                        onPressed: () {
-                          // Navigate to Login Page
-                          Navigator.pushNamed(context, '/login');
-                        },
-                        child: const Text(
-                          "Login",
-                          style: TextStyle(
-                            color: Colors.purple,
-                            fontWeight: FontWeight.bold,
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      "Connect with your friends today!",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Username Field
+                    CustomTextField(
+                      hintText: "Enter Your Username",
+                      controller: _usernameController,
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Email Field
+                    CustomTextField(
+                      hintText: "Enter Your Email",
+                      controller: _emailController,
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Phone Number Field
+                    CustomTextField(
+                      hintText: "Enter Your Phone Number",
+                      controller: _phoneController,
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Password Field
+                    CustomTextField(
+                      hintText: "Enter Your Password",
+                      isPassword: true,
+                      controller: _passwordController,
+                    ),
+                    const SizedBox(height: 40),
+
+                    // Sign Up Button
+                    RoundedButton(
+                      text: "Sign up",
+                      onPressed: _signUp, // Κλήση της μεθόδου εγγραφής
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Already have an account? Login
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          "Already have an account?",
+                          style: TextStyle(color: Colors.black),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/login');
+                          },
+                          child: const Text(
+                            "Login",
+                            style: TextStyle(
+                              color: Colors.purple,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
   @override
   void dispose() {
