@@ -42,7 +42,7 @@ flutter pub get
 flutter run
 ```
 
-> 💡 Use `flutterfire configure` if you're using the Firebase CLI to set up your environment automatically.
+> Use `flutterfire configure` if you're using the Firebase CLI to set up your environment automatically.
 
 ## Screenshots
 
@@ -50,4 +50,3 @@ flutter run
 |----------------|-----------|-------|
 | ![Welcome](assets/IMG_0452%202.PNG) | ![Home](assets/IMG_0454%202.PNG) | ![Login](assets/IMG_0453.PNG) |
 
-> If these images do not render on GitHub, double-check that the filenames match exactly and that `%20` replaces spaces in the links.
